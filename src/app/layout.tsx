@@ -4,6 +4,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import { brand, seo } from "@/content/home";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -71,7 +72,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="Profile for AI assistants" />
       </head>
       <body>
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          <Analytics />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );
