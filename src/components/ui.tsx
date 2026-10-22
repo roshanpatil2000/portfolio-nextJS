@@ -41,6 +41,7 @@ export function AccentHeading({
   tail = "",
   className = "",
   reveal = true,
+  srPrefix,
 }: {
   as?: "h1" | "h2";
   lead: string;
@@ -48,9 +49,12 @@ export function AccentHeading({
   tail?: string;
   className?: string;
   reveal?: boolean;
+  /** Read by crawlers and screen readers only, e.g. a name already shown visually elsewhere. */
+  srPrefix?: string;
 }) {
   return (
     <Tag {...(reveal ? { "data-reveal": true } : {})} className={className}>
+      {srPrefix && <span className="sr-only">{srPrefix} </span>}
       {lead} <span className="font-serif font-normal italic">{accent}</span>
       {tail}
     </Tag>

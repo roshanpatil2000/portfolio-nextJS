@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Geist_Mono, Instrument_Serif, Inter } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
-import { brand } from "@/content/home";
+import { brand, seo } from "@/content/home";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -28,8 +29,31 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: `${brand.name} — ${brand.tagline}`,
-  description: brand.description,
+  metadataBase: new URL(siteUrl),
+  title: { default: seo.title, template: `%s — ${brand.name}` },
+  description: seo.description,
+  applicationName: brand.name,
+  keywords: seo.keywords,
+  authors: [{ name: brand.name, url: siteUrl }],
+  creator: brand.name,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "profile",
+    url: "/",
+    siteName: brand.name,
+    title: seo.title,
+    description: seo.description,
+    locale: "en_IN",
+    firstName: seo.givenName,
+    lastName: seo.familyName,
+  },
+  twitter: { card: "summary_large_image", title: seo.title, description: seo.description },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  category: "technology",
 };
 
 // Runs before paint so the stored theme never flashes.
@@ -44,6 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="Profile for AI assistants" />
       </head>
       <body>
         <SmoothScroll>{children}</SmoothScroll>

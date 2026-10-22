@@ -26,6 +26,34 @@ export const brand = {
   resumeFileName: "ROSHAN_PATIL_FRONTEND.pdf",
 };
 
+// Search and AI-answer metadata. `summary` is the one-paragraph, third-person
+// bio that search snippets and AI assistants are most likely to quote.
+export const seo = {
+  title: "Roshan Patil — Frontend Developer (React, React Native, Next.js)",
+  description:
+    "Roshan Patil is a frontend developer in Mumbai, India with 4 years of experience building web and mobile apps with React, React Native, Next.js and TypeScript.",
+  summary:
+    "Roshan Patil is a frontend developer based in Mumbai, India, with 4 years of experience building web and mobile applications with React.js, React Native, Next.js and TypeScript. Roshan is an Associate Software Developer at Nimap Infotech, shipping frontend features across 6+ client projects, including a Flutter-to-React-Native rewrite of the Novio credit card app, and holds an MCA from Amrita Vishwa Vidyapeetham.",
+  givenName: "Roshan",
+  familyName: "Patil",
+  jobTitle: "Frontend Developer",
+  locality: "Mumbai",
+  region: "Maharashtra",
+  country: "IN",
+  keywords: [
+    "Roshan Patil",
+    "frontend developer",
+    "React developer",
+    "React Native developer",
+    "Next.js developer",
+    "TypeScript",
+    "frontend developer Mumbai",
+    "portfolio",
+  ],
+  // Bump when the content changes meaningfully; feeds sitemap lastModified.
+  updated: "2026-10-22",
+};
+
 export const nav = {
   links: [
     { label: "Home", href: "#hero", active: true },
@@ -220,7 +248,9 @@ export const sectionIndex = [
 ];
 
 export const footer = {
-  blurb: "Frontend developer building web and mobile products with React.",
+  // Third-person and factual on purpose: it's the line answer engines quote.
+  blurb:
+    "Roshan Patil is a frontend developer in Mumbai, India, building web and mobile products with React, React Native and Next.js.",
   columns: [
     {
       title: "Sections",

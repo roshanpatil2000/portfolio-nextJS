@@ -38,6 +38,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `RESUME_ADMIN_TOKEN` | Uploading a new resume | **You create it.** Any random string of 24+ characters, e.g. `openssl rand -base64 32`. It's the password you type on `/admin/resume`. |
 | `BLOB_READ_WRITE_TOKEN` | Storing and serving the resume on Vercel | Added automatically when you connect a Vercel Blob store. |
 | `BLOB_STORE_ID`, `BLOB_WEBHOOK_PUBLIC_KEY` | — | Also added by Vercel Blob. Not used by this code; leave them alone. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, structured data | Optional. Set it once you have a custom domain (e.g. `https://roshanpatil.dev`). Without it, Vercel's production URL is used. |
 
 Never paste a `BLOB_*` value into the admin page; it only takes `RESUME_ADMIN_TOKEN`.
 
@@ -48,6 +49,7 @@ Without `BLOB_READ_WRITE_TOKEN` (local dev), the resume is stored in `.data/resu
 All copy lives in [`src/content/home.ts`](src/content/home.ts). Components only render it.
 
 - **`brand`:** name, wordmark, email, GitHub/LinkedIn links, resume download name.
+- **`seo`:** page title, description, the third-person bio used by search and AI, keywords, last-updated date.
 - **`hero`, `projects`, `experience`, `skills`, `contact`:** section copy.
 - **`skillTiles`:** the skills shown as tiles in the hero galaxy. `icon` keys map to logos in [`src/lib/skillTiles.ts`](src/lib/skillTiles.ts); a skill without a logo uses `mono` and `color` for a lettered tile.
 - **`sectionIndex`:** the labels that ride the right-edge ruler.
@@ -76,6 +78,25 @@ How it's protected:
 
 After an upload the CDN may serve the previous file for up to a minute.
 
+## SEO and AI discoverability
+
+The site is set up for both search engines (SEO) and AI answer engines like ChatGPT, Claude and Perplexity (GEO). Everything is generated from `src/content/home.ts`, so it stays in sync with the page.
+
+| What | Where | Why |
+| --- | --- | --- |
+| Title, description, Open Graph, Twitter card, canonical URL | `metadata` in [`src/app/layout.tsx`](src/app/layout.tsx), copy in `seo` | Search snippets and link previews |
+| Share image (1200×630) | [`src/app/opengraph-image.tsx`](src/app/opengraph-image.tsx) | Preview card on LinkedIn, X, Slack, chats |
+| JSON-LD structured data | [`src/components/StructuredData.tsx`](src/components/StructuredData.tsx) | `Person` (job, employer, education, skills, GitHub/LinkedIn), `ProfilePage`, `WebSite` and an `ItemList` of projects |
+| `/llms.txt` | [`src/app/llms.txt/route.ts`](src/app/llms.txt/route.ts) | Plain-markdown profile for AI assistants ([llmstxt.org](https://llmstxt.org)); linked from every page's `<head>` |
+| `/robots.txt` | [`src/app/robots.ts`](src/app/robots.ts) | Allows all crawlers, names the major AI crawlers explicitly, blocks `/admin/` and `/api/` |
+| `/sitemap.xml` | [`src/app/sitemap.ts`](src/app/sitemap.ts) | Lists the homepage and `/llms.txt` |
+
+On the page itself, the `h1` includes your name for crawlers and screen readers, and the footer has a factual one-line bio. `seo.summary` is the bio that AI answers are most likely to quote; keep it accurate. Bump `seo.updated` when the content changes.
+
+The resume PDF at `/resume` is sent with `X-Robots-Tag: noindex`, so its personal details (like a phone number) stay out of search results while it remains downloadable.
+
+After deploying, check the structured data with Google's [Rich Results Test](https://search.google.com/test/rich-results) and submit `/sitemap.xml` in [Google Search Console](https://search.google.com/search-console).
+
 ## Deploying to Vercel
 
 1. Import the repository into Vercel.
@@ -83,6 +104,7 @@ After an upload the CDN may serve the previous file for up to a minute.
 3. Under **Settings → Environment Variables**, add `RESUME_ADMIN_TOKEN` (Production, marked Sensitive). Keep a copy in your password manager; Vercel won't show it again.
 4. Redeploy so the variables take effect.
 5. Open `/admin/resume` on the live site and upload your resume once. Until then `/resume` returns 404.
+6. If you add a custom domain, set `NEXT_PUBLIC_SITE_URL` to it and redeploy, so canonical URLs and the sitemap use the domain.
 
 ## Project structure
 
@@ -90,6 +112,10 @@ After an upload the CDN may serve the previous file for up to a minute.
 src/
   app/
     page.tsx                  homepage
+    layout.tsx                fonts, theme, site-wide metadata
+    opengraph-image.tsx       generated share image
+    robots.ts, sitemap.ts     crawler rules and sitemap
+    llms.txt/route.ts         profile for AI assistants
     resume/route.ts           GET: download the current resume
     api/resume/route.ts       POST: replace the resume (token-protected)
     admin/resume/             unlisted upload page
@@ -100,6 +126,7 @@ src/
     ProjectGrid, Experience, Skills, Contact, Nav, Footer, ...
   content/home.ts             all site copy
   lib/
+    site.ts                   canonical site URL
     resumeStore.ts            Blob storage (disk in dev)
     adminAuth.ts              bearer-token check
     skillTiles.ts             skill logo tiles

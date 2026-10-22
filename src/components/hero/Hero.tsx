@@ -19,6 +19,7 @@ export default function Hero() {
             <Wordmark />
             <AccentHeading
               as="h1"
+              srPrefix={`${brand.name},`}
               lead={hero.headline}
               accent={hero.headlineAccent}
               className="relative mt-8 font-display text-3xl font-medium leading-[1.05] tracking-[-0.03em] text-ink-strong md:text-[2.75rem] [&>span]:text-muted"

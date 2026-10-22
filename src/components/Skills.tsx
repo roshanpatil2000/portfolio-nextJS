@@ -19,7 +19,7 @@ export default function Skills() {
         {skills.groups.map((g, i) => (
           <article key={g.key} data-reveal className="bg-bg p-6 md:p-8">
             <div className="flex items-center justify-between">
-              <p className="hud-label text-muted">{g.key}</p>
+              <h3 className="hud-label text-muted">{g.key}</h3>
               <p className="hud-label text-faint">{pad(i + 1)}</p>
             </div>
             <ul className="mt-6 flex flex-wrap gap-2">

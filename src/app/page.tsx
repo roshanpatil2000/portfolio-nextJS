@@ -7,10 +7,12 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Rail from "@/components/rail/Rail";
 import Choreography from "@/components/Choreography";
+import StructuredData from "@/components/StructuredData";
 
 export default function Home() {
   return (
     <>
+      <StructuredData />
       <Nav />
       <main id="main">
         <Hero />

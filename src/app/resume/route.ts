@@ -18,6 +18,9 @@ export async function GET() {
       // Short CDN cache so a new upload shows up within a minute.
       "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=60",
       "X-Content-Type-Options": "nosniff",
+      // Downloadable, but kept out of search results: the PDF carries personal
+      // details (like a phone number) that shouldn't surface in snippets.
+      "X-Robots-Tag": "noindex",
     },
   });
 }
