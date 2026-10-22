@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Media } from "@/content/home";
 import { paintScene } from "@/lib/generative";
+import { paintSkillTile, type Skill } from "@/lib/skillTiles";
 
 const fill = "absolute inset-0 h-full w-full object-cover";
 
@@ -10,7 +11,22 @@ export default function MediaView({ media }: { media: Media }) {
   if (media.kind === "video") {
     return <video className={fill} src={media.src} poster={media.poster} autoPlay muted loop playsInline preload="metadata" />;
   }
+  if (media.kind === "skill") return <SkillCanvas skill={media} />;
   return <GenerativeCanvas seed={media.seed} />;
+}
+
+function SkillCanvas({ skill }: { skill: Skill }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const s = getComputedStyle(document.documentElement);
+    paintSkillTile(ref.current, skill, {
+      dark: document.documentElement.dataset.theme !== "light",
+      ink: s.getPropertyValue("--ink").trim(),
+      bg: s.getPropertyValue("--bg").trim(),
+    });
+  }, [skill]);
+  return <canvas ref={ref} className={fill} aria-label={skill.name} />;
 }
 
 // Animates only while on screen, at ~30fps and a capped resolution.

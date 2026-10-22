@@ -1,191 +1,243 @@
-// All copy and media for the homepage. Rename the brand or swap media here.
-// A media item is either a real video in /public/videos or a generative
+// All copy and media for the portfolio. Edit here; components only render it.
+// A media item is either a real video/image in /public or a generative
 // placeholder (procedural canvas art keyed by a seed).
+
+import type { Skill } from "@/lib/skillTiles";
 
 export type Media =
   | { kind: "video"; src: string; poster?: string }
-  | { kind: "generative"; seed: number };
+  | { kind: "generative"; seed: number }
+  | ({ kind: "skill" } & Skill);
 
 export const brand = {
-  name: "Studio",
-  wordmark: "STUDIO",
-  tagline: "Controllable tools for creators",
+  name: "Roshan Patil",
+  wordmark: "ROSHAN",
+  tagline: "Frontend Developer",
   description:
-    "An open-source studio for controllable image and video creation.",
-  email: "hello@example.com",
+    "Frontend developer with 4 years of experience building web and mobile apps with React, React Native and Next.js.",
+  email: "roshanpatil2912.rp@gmail.com",
+  location: "Mumbai, India",
+  links: {
+    github: "https://github.com/roshanpatil2000",
+    linkedin: "https://www.linkedin.com/in/patil-roshan/",
+  },
+  // Served by app/resume/route.ts from private storage; replace it at /admin/resume.
+  resume: "/resume",
+  resumeFileName: "ROSHAN_PATIL_FRONTEND.pdf",
 };
 
 export const nav = {
   links: [
-    { label: "Home", href: "/", active: true },
-    { label: "Image", href: "#" },
-    { label: "Video", href: "#" },
-    { label: "Resources", href: "#" },
-    { label: "Download", href: "#start" },
-    { label: "Support", href: "#" },
+    { label: "Home", href: "#hero", active: true },
+    { label: "Projects", href: "#projects" },
+    { label: "Experience", href: "#experience" },
+    { label: "Skills", href: "#skills" },
+    { label: "Contact", href: "#contact" },
   ],
   secondary: [
-    { label: "Apps", href: "#" },
-    { label: "Pricing", href: "#" },
+    { label: "GitHub", href: brand.links.github },
+    { label: "Resume", href: brand.resume, download: brand.resumeFileName },
   ],
-  cta: { label: "Launch app", href: "#start" },
+  cta: { label: "Hire me", href: `mailto:${brand.email}` },
 };
 
 export const hero = {
-  headline: "Capable tools",
-  headlineAccent: "for creators.",
-  sub: "We build open source tools for creative people. Freedom of control and expression comes first.",
-  primary: { label: "Download free", href: "#start" },
-  secondary: { label: "Use on web", href: "#start" },
-  meta: ["Open source on GitHub", "macOS · Windows · Web", "No subscription required"],
+  headline: "Frontend developer",
+  headlineAccent: "crafting interfaces.",
+  sub: "I build fast, reusable UI for web and mobile with React, React Native and Next.js — 4 years, 6+ client products.",
+  primary: { label: "View projects", href: "#projects" },
+  secondary: { label: "Get in touch", href: "#contact" },
+  meta: ["GitHub", brand.location, "React · React Native · Next.js"],
 };
 
 export const marquee = [
-  "Scene builder",
-  "Depth compositing",
-  "Character posing",
-  "Image to mesh",
-  "Background removal",
-  "Layered control",
-  "Mixed assets",
-  "Location lock",
+  "React.js",
+  "React Native",
+  "Next.js",
+  "TypeScript",
+  "Tailwind CSS",
+  "Redux",
+  "Zustand",
+  "Expo",
+  "Vitest",
+  "Agentic AI workflows",
 ];
 
-// Pool the hero galaxy draws its cards from.
-export const galaxyMedia: Media[] = Array.from({ length: 14 }, (_, i) => ({
-  kind: "generative" as const,
-  seed: i + 1,
-}));
+// Pool the hero galaxy draws its cards from: one tile per skill. `icon` keys
+// come from src/lib/skillTiles.ts; skills without a logo get a monogram.
+const skillTiles: Skill[] = [
+  // Languages
+  { name: "JavaScript", icon: "javascript" },
+  { name: "TypeScript", icon: "typescript" },
+  { name: "HTML5", icon: "html5" },
+  { name: "CSS3", icon: "css" },
+  // Frameworks
+  { name: "React.js", icon: "react" },
+  { name: "React Native", icon: "react" },
+  { name: "Next.js", icon: "nextjs" },
+  { name: "Expo", icon: "expo" },
+  { name: "Tailwind CSS", icon: "tailwind" },
+  // UI libraries and state
+  { name: "Ant Design", icon: "antdesign" },
+  { name: "Bootstrap", icon: "bootstrap" },
+  { name: "Redux", icon: "redux" },
+  { name: "Zustand", mono: "Zu", color: "c98b3a" },
+];
 
-export const features = {
+export const galaxyMedia: Media[] = skillTiles.map((s) => ({ kind: "skill", ...s }));
+
+export const projects = {
   index: "01",
-  title: "Crafting features",
-  side: "Real output — captured in the studio",
-  heading: "The control that",
-  headingAccent: "mere words",
-  headingTail: "cannot buy.",
-  sub: "Text prompting is neat, but creators crave control. Compose the shot yourself — then let the model render it.",
+  title: "Selected projects",
+  side: "Web · Mobile · AI-assisted",
+  heading: "Products I've",
+  headingAccent: "helped ship",
+  headingTail: ".",
+  sub: "Client work across fintech, enterprise, travel and edtech — from greenfield rewrites to design-system-driven features.",
   items: [
     {
-      label: "Worlds",
-      title: "Image to location",
-      body: "Place virtual actors into physical environments. Keep a single location consistent and film multiple shots without things disappearing.",
+      label: "Fintech · Mobile",
+      title: "Novio Credit Card",
+      stack: ["React Native", "Claude Code", "Figma"],
+      body: "Rebuilt a credit card app from Flutter to React Native from scratch, with full functional parity. Set up an AI-assisted workflow — custom skills, agents and rules — that pulled screens straight from Figma and kept generated code inside the design system.",
       media: { kind: "generative", seed: 21 } as Media,
     },
     {
-      label: "3D compositing",
-      title: "Build scenes with depth",
-      body: "Use images, backdrops, foreground elements and props in scenes with real depth. A couple of images blend into a finished composition.",
+      label: "AI · Web",
+      title: "DemoKraft AI",
+      stack: ["React.js"],
+      body: "Built interfaces for an AI platform that turns products into videos, guides and GIFs. Reusable components and content-creation workflows that keep the app modular.",
       media: { kind: "generative", seed: 22 } as Media,
     },
     {
-      label: "2D compositing",
-      title: "Precise layered control",
-      body: "Combine images, background removal, layers and simple drawing tools to compose a scene exactly the way you imagined it.",
+      label: "Enterprise · Web + Mobile",
+      title: "KPMG EAM",
+      stack: ["React.js", "React Native"],
+      body: "Web and mobile interfaces for an enterprise asset management product — asset lifecycle views, responsive layouts and API-driven screens across both platforms.",
       media: { kind: "generative", seed: 23 } as Media,
     },
     {
-      label: "3D mesh",
-      title: "Image to 3D mesh",
-      body: "Turning images into 3D helps position elements exactly. Block complex scenes with intentional geometry instead of fighting prompts.",
+      label: "Travel · Mobile",
+      title: "Lugbee",
+      stack: ["React Native"],
+      body: "Mobile app that helps travellers find and book secure luggage storage nearby. Built the discovery and booking flows with reusable components and API integration.",
       media: { kind: "generative", seed: 24 } as Media,
     },
     {
-      label: "Mixed assets",
-      title: "Mix every kind of asset",
-      body: "Combine image cutouts, worlds and 3D meshes in one canvas to lay out scenes with precision and intention.",
+      label: "Edtech · Web",
+      title: "TopperLearning",
+      stack: ["HTML", "CSS", "JavaScript", "SEO"],
+      body: "Responsive, content-rich pages for a Grades 1–12 learning platform. Semantic, mobile-first markup and SEO work that lifted organic traffic by 20%.",
       media: { kind: "generative", seed: 25 } as Media,
-    },
-    {
-      label: "Posing",
-      title: "Character posing",
-      body: "Pose your characters to nail the character, scene and camera blocking before calling “action”.",
-      media: { kind: "generative", seed: 26 } as Media,
-    },
-    {
-      label: "Cutouts",
-      title: "Background removal",
-      body: "Get clean cutouts in one click, ready to drop into any composition.",
-      media: { kind: "generative", seed: 27 } as Media,
     },
   ],
   more: {
-    label: "And more",
-    title: "See every tool",
-    body: "Tutorials, guides and the full feature list.",
-    href: "#",
+    label: "More",
+    title: "See more on GitHub",
+    body: "Experiments, side projects and open-source contributions.",
+    href: brand.links.github,
   },
 };
 
-export const ownership = {
+export const experience = {
   index: "02",
-  title: "Ownership",
-  side: "Free & open source",
-  heading: "Owning, not",
-  headingAccent: "renting",
+  title: "Experience",
+  side: "4 years · 2 companies",
+  heading: "Where I've",
+  headingAccent: "been building",
   headingTail: ".",
-  sub: "The studio is yours to own and keep, forever. No lock-in, no aggregator markup, no surprises.",
-  items: [
+  stats: [
+    { value: "4", unit: "yrs", label: "Frontend experience" },
+    { value: "6+", unit: "", label: "Client projects shipped" },
+    { value: "~30", unit: "%", label: "Fewer production bugs with TDD" },
+    { value: "+20", unit: "%", label: "Organic traffic from SEO work" },
+  ],
+  roles: [
     {
       key: "A",
-      title: "Open source",
-      body: "The whole studio is on GitHub. Read it, fork it, build on it.",
-      cta: { label: "View source", href: "#" },
+      period: "Dec 2023 — Present",
+      role: "Associate Software Developer",
+      company: "Nimap Infotech",
+      place: "Mumbai",
+      points: [
+        "Build reusable components and responsive interfaces for client web and mobile apps with React, Next.js, React Native, TypeScript, Tailwind, Redux and Zustand.",
+        "Turn business requirements and designs into production features across 6+ client projects.",
+        "Shape frontend architecture and state management, and integrate REST APIs with backend, design and QA teams.",
+      ],
     },
     {
       key: "B",
-      title: "Yours forever",
-      body: "Download once and keep it. Your projects and renders stay on your machine.",
+      period: "Oct 2022 — Dec 2023",
+      role: "Assistant Software Developer",
+      company: "VAA Technologies",
+      place: "Boisar",
+      points: [
+        "Built React interfaces and integrated REST APIs with cross-functional teams.",
+        "Connected custom React components to Builder.io so editors could reuse them across pages.",
+        "Introduced test-driven development with Vitest, cutting production bugs by ~30%.",
+      ],
     },
-    {
-      key: "C",
-      title: "No middleman",
-      body: "No aggregator between you and the models. Bring your own keys and pay providers directly.",
-    },
+  ],
+  education: [
+    { school: "Amrita Vishwa Vidyapeetham, Coimbatore", degree: "MCA", year: "2023" },
+    { school: "S.D.S.M. College, Palghar", degree: "B.Sc Computer Science", year: "2021" },
   ],
 };
 
-export const community = {
+export const skills = {
   index: "03",
-  title: "Community",
-  side: "From the community",
-  heading: "Made",
-  headingAccent: "with",
-  headingTail: " the studio.",
-  // Set youtubeId to a real video to enable click-to-play.
-  items: [
-    { caption: "Community film", title: "Short film one", youtubeId: "", seed: 31 },
-    { caption: "Community film", title: "Short film two", youtubeId: "", seed: 32 },
-    { caption: "Community film", title: "Short film three", youtubeId: "", seed: 33 },
+  title: "Skills",
+  side: "Toolbox",
+  heading: "The",
+  headingAccent: "toolbox",
+  headingTail: " I reach for.",
+  groups: [
+    { key: "Languages", items: ["JavaScript", "TypeScript", "HTML5", "CSS3"] },
+    { key: "Frontend", items: ["React.js", "React Native", "Next.js", "Expo", "Tailwind CSS", "Ant Design", "Bootstrap"] },
+    { key: "State", items: ["Redux", "Zustand"] },
+    { key: "Testing", items: ["Vitest", "Test-driven development"] },
+    { key: "Tools", items: ["Git", "VS Code", "Cursor", "Builder.io", "Claude Code"] },
+    { key: "Also", items: ["REST APIs", "OAuth", "Web Workers", "i18n", "Agentic AI workflows"] },
   ],
 };
 
-export const start = {
-  eyebrow: "Free to start · No subscription",
-  heading: "Start",
-  headingAccent: "crafting",
-  headingTail: " today.",
-  sub: "Download the studio, or run it in your browser. Your first renders are minutes away.",
-  primary: { label: "Download for desktop", href: "#" },
-  secondary: { label: "Launch in browser", href: "#" },
+export const contact = {
+  eyebrow: "Open to new opportunities",
+  heading: "Let's build",
+  headingAccent: "something",
+  headingTail: " together.",
+  sub: "Have a product to ship or a team that needs a frontend developer? My inbox is open.",
+  primary: { label: "Email me", href: `mailto:${brand.email}` },
+  secondary: { label: "Download resume", href: brand.resume },
 };
 
-// Sections the right-edge rail tracks, in page order. The hero entry is
-// represented by the wordmark itself.
 export const sectionIndex = [
   { id: "hero", label: brand.wordmark },
-  { id: "features", label: "FEATURES" },
-  { id: "ownership", label: "OWNERSHIP" },
-  { id: "made-with", label: "COMMUNITY" },
-  { id: "start", label: "GET STARTED" },
+  { id: "projects", label: "PROJECTS" },
+  { id: "experience", label: "EXPERIENCE" },
+  { id: "skills", label: "SKILLS" },
+  { id: "contact", label: "CONTACT" },
 ];
 
 export const footer = {
-  blurb: "The open-source studio for controllable image and video.",
+  blurb: "Frontend developer building web and mobile products with React.",
   columns: [
-    { title: "Product", links: ["Download", "Pricing", "Launch app"] },
-    { title: "Apps", links: ["All apps", "Photo", "Vector", "Film", "Light"] },
-    { title: "Resources", links: ["Tutorials", "News", "FAQ", "Press kit", "Support"] },
-    { title: "Community", links: ["Discord", "GitHub", "YouTube", "Instagram"] },
+    {
+      title: "Sections",
+      links: [
+        { label: "Projects", href: "#projects" },
+        { label: "Experience", href: "#experience" },
+        { label: "Skills", href: "#skills" },
+        { label: "Contact", href: "#contact" },
+      ],
+    },
+    {
+      title: "Elsewhere",
+      links: [
+        { label: "GitHub", href: brand.links.github },
+        { label: "LinkedIn", href: brand.links.linkedin },
+        { label: "Email", href: `mailto:${brand.email}` },
+      ],
+    },
   ],
 };

@@ -29,7 +29,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const instance = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+    // anchors: in-page #links glide instead of jumping, landing below the nav.
+    const instance = new Lenis({ lerp: 0.1, wheelMultiplier: 1, anchors: { offset: -48 } });
     instance.on("scroll", ScrollTrigger.update);
     const raf = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(raf);

@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { galaxyMedia, type Media } from "@/content/home";
 import { sceneFrame } from "@/lib/generative";
+import { paintSkillTile, toHex } from "@/lib/skillTiles";
 import { introBeats, introClock } from "@/components/intro/clock";
 import { layout, look, mobile, motion, pointer } from "./galaxyConfig";
 import { cardFragment, cardVertex } from "./shaders";
@@ -32,6 +33,7 @@ type Card = {
   flare: number; // sweep dispersion picked up from the cursor
   wob: number; // wobble phase
   cycle: number; // which lap of the conveyor it's on (picks media)
+  tex: number; // index of the media texture it's showing, -1 for none
   clicks: { u: number; v: number; born: number }[];
   // Per-frame scratch
   x: number;
@@ -49,13 +51,23 @@ function readColors() {
   const dark = document.documentElement.dataset.theme !== "light";
   return {
     dark,
-    ink: s.getPropertyValue("--ink").trim() || "#f2f1ee",
-    bg: s.getPropertyValue("--bg").trim() || "#121316",
-    accent: s.getPropertyValue("--accent").trim() || "#2d81ff",
+    ink: toHex(s.getPropertyValue("--ink").trim(), "#f2f1ee"),
+    bg: toHex(s.getPropertyValue("--bg").trim(), "#121316"),
+    accent: toHex(s.getPropertyValue("--accent").trim(), "#2d81ff"),
   };
 }
 
-function makeTexture(media: Media): THREE.Texture {
+function makeTexture(media: Media, colors: ReturnType<typeof readColors>): THREE.Texture {
+  if (media.kind === "skill") {
+    const canvas = document.createElement("canvas");
+    paintSkillTile(canvas, media, colors);
+    const tex = new THREE.CanvasTexture(canvas);
+    // Tiles get drawn far smaller than they're painted, so mipmap them.
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.generateMipmaps = true;
+    tex.userData.skill = media;
+    return tex;
+  }
   if (media.kind === "video") {
     const v = document.createElement("video");
     v.src = media.src;
@@ -102,8 +114,9 @@ function Field({
 
   // Build every card once; how many are active depends on the viewport.
   useEffect(() => {
-    colors.current = readColors();
-    const textures = galaxyMedia.map(makeTexture);
+    const initial = readColors();
+    colors.current = initial;
+    const textures = galaxyMedia.map((m) => makeTexture(m, initial));
     texturesRef.current = textures;
     const geo = new THREE.PlaneGeometry(1, 1, 24, 24);
     const cards: Card[] = Array.from({ length: MAX_CARDS }, (_, i) => {
@@ -147,6 +160,7 @@ function Field({
         flare: 0,
         wob: Math.random() * TAU,
         cycle: -1,
+        tex: -1,
         clicks: [],
         x: 0,
         y: 0,
@@ -171,7 +185,7 @@ function Field({
 
   useEffect(() => invalidate(), [size, invalidate]);
 
-  // Theme colours feed the frame hairline and the line underlay.
+  // Theme colours feed the frame hairline, the line underlay and the skill tiles.
   useEffect(() => {
     // The tokens transition for 0.4s, so read again once they've settled.
     let settle = 0;
@@ -180,7 +194,13 @@ function Field({
       invalidate();
       window.clearTimeout(settle);
       settle = window.setTimeout(() => {
-        colors.current = readColors();
+        const c = readColors();
+        colors.current = c;
+        for (const tex of texturesRef.current) {
+          if (!tex.userData.skill) continue;
+          paintSkillTile(tex.image as HTMLCanvasElement, tex.userData.skill, c);
+          tex.needsUpdate = true;
+        }
         invalidate();
       }, 450);
     };
@@ -306,7 +326,17 @@ function Field({
       let j = frac(raw);
       if (cycle !== c.cycle) {
         c.cycle = cycle;
-        const m = Math.abs((cycle * 7 + k * 13 + arm * 5) % textures.length);
+        // Reborn cards take whichever tile is least shown right now, so the
+        // same skill rarely appears twice side by side.
+        const uses = new Array<number>(textures.length).fill(0);
+        for (let o = 0; o < count; o++) if (o !== k && cards[o].tex >= 0) uses[cards[o].tex]++;
+        const start = Math.abs(cycle * 7 + k * 13) % textures.length;
+        let m = start;
+        for (let s = 0; s < textures.length; s++) {
+          const cand = (start + s) % textures.length;
+          if (uses[cand] < uses[m]) m = cand;
+        }
+        c.tex = m;
         c.mat.uniforms.uMap.value = textures[m];
         c.clicks.length = 0;
         c.boostOn = false;

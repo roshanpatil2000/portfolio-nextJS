@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { hero } from "@/content/home";
+import { brand, hero } from "@/content/home";
 import Wordmark, { HeroScrim } from "./Wordmark";
 import Marquee from "@/components/Marquee";
-import { AccentHeading, Button, DesktopIcon, GithubIcon } from "@/components/ui";
+import { AccentHeading, ArrowIcon, Button, GithubIcon } from "@/components/ui";
 
 const Galaxy = dynamic(() => import("./Galaxy"), { ssr: false });
 
@@ -28,15 +28,20 @@ export default function Hero() {
             </p>
             <div data-reveal className="pointer-events-auto relative mt-7 flex flex-wrap items-center justify-center gap-3">
               <Button href={hero.primary.href}>
-                <DesktopIcon className="h-4 w-4" />
                 {hero.primary.label}
+                <ArrowIcon className="h-4 w-4 rotate-90 transition-transform duration-200 group-hover/btn:translate-y-0.5" />
               </Button>
               <Button href={hero.secondary.href} variant="outline" className="bg-bg/60 backdrop-blur-sm">
                 {hero.secondary.label}
               </Button>
             </div>
             <div data-reveal className="pointer-events-auto relative mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <a href="#" className="hud-label flex items-center gap-1.5 text-faint transition-colors hover:text-ink">
+              <a
+                href={brand.links.github}
+                target="_blank"
+                rel="noreferrer"
+                className="hud-label flex items-center gap-1.5 text-faint transition-colors hover:text-ink"
+              >
                 <GithubIcon className="h-3 w-3" />
                 {hero.meta[0]}
               </a>

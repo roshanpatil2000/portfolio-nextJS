@@ -1,9 +1,9 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/hero/Hero";
-import FeatureGrid from "@/components/FeatureGrid";
-import OwnershipGrid from "@/components/OwnershipGrid";
-import CommunityGrid from "@/components/CommunityGrid";
-import FinalCta from "@/components/FinalCta";
+import ProjectGrid from "@/components/ProjectGrid";
+import Experience from "@/components/Experience";
+import Skills from "@/components/Skills";
+import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Rail from "@/components/rail/Rail";
 import Choreography from "@/components/Choreography";
@@ -14,10 +14,10 @@ export default function Home() {
       <Nav />
       <main id="main">
         <Hero />
-        <FeatureGrid />
-        <OwnershipGrid />
-        <CommunityGrid />
-        <FinalCta />
+        <ProjectGrid />
+        <Experience />
+        <Skills />
+        <Contact />
       </main>
       <Footer />
       <Rail />

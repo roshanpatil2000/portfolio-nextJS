@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { nav } from "@/content/home";
 import ThemeToggle from "@/components/ThemeToggle";
+import NavLinks from "@/components/NavLinks";
 import { Button, LogoMark } from "@/components/ui";
 
 const linkBase = "font-mono text-[11px] font-medium uppercase tracking-[0.15em] px-2 py-1 transition-colors";
@@ -12,22 +13,18 @@ export default function Nav() {
         <LogoMark className="h-[18px] w-auto" />
       </Link>
 
-      <div className="hidden min-w-0 flex-1 items-center gap-3 px-3 lg:flex">
-        {nav.links.map((l) => (
-          <a
-            key={l.label}
-            href={l.href}
-            className={`${linkBase} ${l.active ? "bg-invert-bg text-invert-fg" : "text-muted hover:text-ink"}`}
-          >
-            {l.label}
-          </a>
-        ))}
-      </div>
+      <NavLinks />
       <div className="flex-1 lg:hidden" />
 
       <div className="hidden items-center gap-3 border-l border-line px-4 md:flex">
         {nav.secondary.map((l) => (
-          <a key={l.label} href={l.href} className={`${linkBase} text-muted hover:text-ink`}>
+          <a
+            key={l.label}
+            href={l.href}
+            {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
+            {...("download" in l ? { download: l.download } : {})}
+            className={`${linkBase} text-muted hover:text-ink`}
+          >
             {l.label}
           </a>
         ))}
