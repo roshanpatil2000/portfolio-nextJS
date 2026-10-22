@@ -88,80 +88,33 @@ export function paintSkillTile(canvas: HTMLCanvasElement, skill: Skill, theme: T
   const lum = luminance(brand);
   const glyph = (theme.dark && lum < 0.06) || (!theme.dark && lum > 0.75) ? theme.ink : brand;
 
-  // Base plate with a soft brand-coloured glow behind the logo.
-  ctx.fillStyle = theme.dark ? "#16171b" : "#faf9f7";
-  ctx.fillRect(0, 0, W, H);
-  const glow = ctx.createRadialGradient(W / 2, H * 0.42, 0, W / 2, H * 0.42, H * 0.75);
-  glow.addColorStop(0, rgba(brand, theme.dark ? 0.32 : 0.18));
+  // Transparent tile: just the logo floating in a soft brand-coloured glow
+  // that fades out well before the edges, so no card shape shows.
+  ctx.clearRect(0, 0, W, H);
+  const cx = W / 2;
+  const cy = H / 2;
+  const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, H * 0.48);
+  glow.addColorStop(0, rgba(brand, theme.dark ? 0.28 : 0.16));
   glow.addColorStop(1, rgba(brand, 0));
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
-  // Blueprint grid, echoing the site's hairline frames.
-  ctx.strokeStyle = rgba(ink, theme.dark ? 0.06 : 0.07);
-  ctx.lineWidth = 1;
-  const step = 36;
-  for (let x = (W / 2) % step; x < W; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, H);
-    ctx.stroke();
-  }
-  for (let y = (H / 2) % step; y < H; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(W, y + 0.5);
-    ctx.stroke();
-  }
-
   // Logo, centred so it survives the square crop young cards use.
-  const size = H * 0.4;
-  const cx = W / 2;
-  const cy = H * 0.43;
+  const size = H * 0.56;
   ctx.save();
-  ctx.shadowColor = rgba(brand, theme.dark ? 0.55 : 0.3);
-  ctx.shadowBlur = 40;
+  ctx.shadowColor = rgba(brand, theme.dark ? 0.6 : 0.35);
+  ctx.shadowBlur = 36;
+  ctx.fillStyle = glyph;
   if (icon) {
     ctx.translate(cx - size / 2, cy - size / 2);
     ctx.scale(size / 24, size / 24);
-    ctx.fillStyle = glyph;
     ctx.fill(new Path2D(icon.path));
   } else {
-    ctx.strokeStyle = glyph;
-    ctx.lineWidth = 6;
-    ctx.strokeRect(cx - size / 2 + 3, cy - size / 2 + 3, size - 6, size - 6);
-    ctx.fillStyle = glyph;
-    ctx.font = `700 ${size * 0.42}px ui-monospace, Menlo, monospace`;
+    // No logo in the set: a bold monogram instead.
+    ctx.font = `800 ${size * 0.62}px ui-sans-serif, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(skill.mono ?? skill.name.slice(0, 2).toUpperCase(), cx, cy + size * 0.03);
+    ctx.fillText(skill.mono ?? skill.name.slice(0, 2).toUpperCase(), cx, cy + size * 0.04);
   }
   ctx.restore();
-
-  // Name in the HUD label style.
-  ctx.fillStyle = rgba(ink, 0.78);
-  ctx.font = `500 ${H * 0.058}px ui-monospace, Menlo, monospace`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const label = skill.name.toUpperCase().split("").join(String.fromCharCode(8202));
-  ctx.fillText(label, cx, H * 0.8);
-
-  // Corner crosshair ticks.
-  ctx.strokeStyle = rgba(ink, 0.35);
-  ctx.lineWidth = 2;
-  const t = 14;
-  const m = 26;
-  for (const [x, y] of [
-    [m, m],
-    [W - m, m],
-    [m, H - m],
-    [W - m, H - m],
-  ]) {
-    ctx.beginPath();
-    ctx.moveTo(x - t, y);
-    ctx.lineTo(x + t, y);
-    ctx.moveTo(x, y - t);
-    ctx.lineTo(x, y + t);
-    ctx.stroke();
-  }
 }

@@ -66,6 +66,8 @@ function makeTexture(media: Media, colors: ReturnType<typeof readColors>): THREE
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.generateMipmaps = true;
     tex.userData.skill = media;
+    // The tile is transparent around the logo; premultiply to match the shader.
+    tex.premultiplyAlpha = true;
     return tex;
   }
   if (media.kind === "video") {
@@ -124,6 +126,7 @@ function Field({
         vertexShader: cardVertex,
         fragmentShader: cardFragment,
         transparent: true,
+        premultipliedAlpha: true, // the shader outputs premultiplied colour
         depthTest: false,
         depthWrite: false,
         uniforms: {
@@ -453,7 +456,8 @@ function Field({
       m.uSize.value.set(w, h);
       m.uRadius.value = Math.min(look.cornerPx, h / 4);
       m.uFrameCol.value.set(frameCol);
-      m.uFrameA.value = look.frameAlpha;
+      // Skill logos float free; only image/video cards get the hairline frame.
+      m.uFrameA.value = (m.uMap.value as THREE.Texture).userData.skill ? 0 : look.frameAlpha;
       m.uDrift.value += dt * (reduced ? 0 : 1);
       m.uRipple.value = ripWarp;
       m.uCurve.value = look.curvePx * (h / 160);

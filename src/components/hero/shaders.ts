@@ -77,28 +77,29 @@ export const cardFragment = /* glsl */ `
     float edge = dot(fromC, fromC) * 4.0;
     vec2 ab = fromC * uAber * edge;
 
-    vec3 sharp = vec3(
-      texture2D(uMap, tuv + ab).r,
-      texture2D(uMap, tuv).g,
-      texture2D(uMap, tuv - ab).b
-    );
+    // Textures are premultiplied, so transparent tiles (logos with no plate)
+    // blur and disperse without dark fringes.
+    vec4 sR = texture2D(uMap, tuv + ab);
+    vec4 sG = texture2D(uMap, tuv);
+    vec4 sB = texture2D(uMap, tuv - ab);
+    vec4 sharp = vec4(sR.r, sG.g, sB.b, max(sG.a, max(sR.a, sB.a)));
 
-    vec3 col = sharp;
+    vec4 col = sharp;
     if (uBlur > 0.002) {
-      vec3 acc = sharp;
+      vec4 acc = sharp;
       for (int i = 0; i < 12; i++) {
-        acc += texture2D(uMap, tuv + TAPS[i] * uBlur * uRepeat).rgb;
+        acc += texture2D(uMap, tuv + TAPS[i] * uBlur * uRepeat);
       }
       col = mix(sharp, acc / 13.0, smoothstep(0.0, 0.03, uBlur));
     }
 
-    // Rounded-corner mask in px, plus a hairline frame along the edge.
+    // Rounded-corner mask in px, plus an optional hairline frame along the edge.
     vec2 p = (vUv - 0.5) * uSize;
     float sd = roundedBox(p, uSize * 0.5, uRadius);
     float mask = 1.0 - smoothstep(-0.75, 0.75, sd);
     float frame = (1.0 - smoothstep(0.0, 1.2, abs(sd + 0.6))) * uFrameA;
-    col = mix(col, uFrameCol, frame);
+    col = col * (1.0 - frame) + vec4(uFrameCol, 1.0) * frame;
 
-    gl_FragColor = vec4(col, mask * uAlpha);
+    gl_FragColor = col * (mask * uAlpha);
   }
 `;
