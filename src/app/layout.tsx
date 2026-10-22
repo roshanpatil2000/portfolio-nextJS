@@ -5,6 +5,7 @@ import { brand, seo } from "@/content/home";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <SmoothScroll>
           <Analytics />
+          <SpeedInsights/>
           {children}
         </SmoothScroll>
       </body>
