@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
+/* Registered so theme swaps can transition smoothly. */
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #f2f1ee; }
+@property --bg-raised { syntax: "<color>"; inherits: true; initial-value: #faf9f7; }
+@property --bg-sunken { syntax: "<color>"; inherits: true; initial-value: #e9e8e4; }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #101014; }
+@property --ink-strong { syntax: "<color>"; inherits: true; initial-value: #000; }
+@property --muted { syntax: "<color>"; inherits: true; initial-value: #1010149e; }
+@property --faint { syntax: "<color>"; inherits: true; initial-value: #1010146b; }
+@property --line { syntax: "<color>"; inherits: true; initial-value: #10101429; }
+@property --line-strong { syntax: "<color>"; inherits: true; initial-value: #10101466; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #2d81ff; }
+@property --accent-ink { syntax: "<color>"; inherits: true; initial-value: #1659c4; }
+@property --invert-bg { syntax: "<color>"; inherits: true; initial-value: #101014; }
+@property --invert-fg { syntax: "<color>"; inherits: true; initial-value: #f2f1ee; }
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f2f1ee;
+  --bg-raised: #faf9f7;
+  --bg-sunken: #e9e8e4;
+  --ink: #101014;
+  --ink-strong: #000;
+  --muted: #1010149e;
+  --faint: #1010146b;
+  --line: #10101429;
+  --line-strong: #10101466;
+  --accent: #2d81ff;
+  --accent-ink: #1659c4;
+  --invert-bg: #101014;
+  --invert-fg: #f2f1ee;
+  color-scheme: light;
+}
+
+:root:not([data-theme="light"]),
+:root[data-theme="dark"] {
+  --bg: #121316;
+  --bg-raised: #101014;
+  --bg-sunken: #060607;
+  --ink: #f2f1ee;
+  --ink-strong: #fff;
+  --muted: #f2f1ee99;
+  --faint: #f2f1ee61;
+  --line: #f2f1ee26;
+  --line-strong: #f2f1ee66;
+  --accent: #2d81ff;
+  --accent-ink: #74aaff;
+  --invert-bg: #fff;
+  --invert-fg: #0b0b0c;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-invert-bg: var(--invert-bg);
+  --color-invert-fg: var(--invert-fg);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
+  transition: --bg 0.4s, --ink 0.4s, --muted 0.4s, --faint 0.4s, --line 0.4s,
+    --line-strong 0.4s, --bg-sunken 0.4s, --invert-bg 0.4s, --invert-fg 0.4s;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* The rail stands in for the native scrollbar. */
+html[data-ruler="on"] {
+  scrollbar-width: none;
+}
+html[data-ruler="on"]::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.hud-label {
+  font-family: var(--font-mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.tick {
+  pointer-events: none;
+  position: absolute;
+  width: 11px;
+  height: 11px;
+}
+.tick::before,
+.tick::after {
+  content: "";
+  position: absolute;
+  background: var(--line-strong);
+}
+.tick::before {
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.tick-half::before {
+  top: 5px;
+}
+.tick::after {
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 40s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }
