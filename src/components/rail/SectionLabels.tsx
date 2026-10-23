@@ -412,7 +412,7 @@ export default function SectionLabels({ sections, geom }: { sections: RailSectio
           style={{ width: poolW, height: bottomH, opacity: 0, ...frost, maskImage: poolMask("100%"), WebkitMaskImage: poolMask("100%") }}
         />
       </div>
-      <div className="pointer-events-none fixed inset-0 z-[45]">
+      <div data-track-location="rail" className="pointer-events-none fixed inset-0 z-[45]">
         {sections.map((sec, i) => {
           const node = (nodes.current[i] ??= { letters: [], hit: null });
           return (

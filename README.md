@@ -38,6 +38,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | `RESUME_ADMIN_TOKEN` | Uploading a new resume | **You create it.** Any random string of 24+ characters, e.g. `openssl rand -base64 32`. It's the password you type on `/admin/resume`. |
 | `BLOB_READ_WRITE_TOKEN` | Storing and serving the resume on Vercel | Added automatically when you connect a Vercel Blob store. |
 | `BLOB_STORE_ID`, `BLOB_WEBHOOK_PUBLIC_KEY` | — | Also added by Vercel Blob. Not used by this code; leave them alone. |
+| `NEXT_PUBLIC_MIXPANEL_TOKEN` | Mixpanel analytics | Optional. Your Mixpanel project token (Project settings → Access keys). It's public by design; leave empty to disable tracking. |
+| `NEXT_PUBLIC_MIXPANEL_API_HOST` | Mixpanel region | Optional. Defaults to US (`https://api.mixpanel.com`). Use `https://api-eu.mixpanel.com` or `https://api-in.mixpanel.com` for EU or India projects. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, structured data | Optional. Set it once you have a custom domain (e.g. `https://roshanpatil.dev`). Without it, Vercel's production URL is used. |
 
 Never paste a `BLOB_*` value into the admin page; it only takes `RESUME_ADMIN_TOKEN`.
@@ -77,6 +79,37 @@ How it's protected:
 - There's no read or list endpoint on `/api/resume`.
 
 After an upload the CDN may serve the previous file for up to a minute.
+
+## Analytics
+
+- **Vercel Analytics and Speed Insights:** page views and Core Web Vitals, on automatically when deployed to Vercel.
+- **Mixpanel:** product analytics, session replay and heatmaps. Set up in [`src/lib/analytics.ts`](src/lib/analytics.ts) and [`src/components/MixpanelTracker.tsx`](src/components/MixpanelTracker.tsx). Events go to the US endpoint (`api.mixpanel.com`) by default; set `NEXT_PUBLIC_MIXPANEL_API_HOST` if the project lives in another region. A mismatch drops events silently. Only Mixpanel's own `$mp_session_record` entries show up, never your events.
+
+### Tracking plan
+
+Event names are snake_case. Clicks, inputs and rage clicks are autocaptured; Mixpanel's own page views are off because `page_view` replaces them.
+
+| Event | Properties | Fired when |
+| --- | --- | --- |
+| `page_view` | `page_location` | Every page load |
+| `contact_intent_submitted` | `intent_type` (`hiring_inquiry`), `landing_page`, `cta_location` | An email link is clicked ("Email me", "Hire me", the address) |
+| `resume_download` | `file_name`, `download_location` (`nav`, `contact`), `page_location` | Any Resume button is clicked |
+| `content_engaged` | `content_type`, `content_id`, `engagement_action` | A section is 35% on screen (`portfolio_section` / `viewed`), a project card is 60% on screen (`project` / `viewed`), the page is half scrolled (`portfolio` / `scrolled_50`). Each fires once per visit |
+| `session_returned` | `return_window_days`, `return_landing_page`, `engaged_feature_on_return` | A visitor returns 1+ days after their last visit; sent as that visit ends. "Engaged" means they contacted you or downloaded the resume |
+
+Supporting UI events: `internal_link_clicked`, `outbound_link_clicked` (`destination`: github, linkedin, …), `skill_tile_clicked`, `theme_changed`.
+
+**Attribution (on every event as super properties):**
+
+- `landing_source`: first-touch channel: `utm_source`, or from the referrer (`organic_search`, `linkedin`, `github`, `twitter`, `ai_assistant`, `referral`, `direct`). Paid UTMs (`utm_medium=cpc`) become `paid_search` / `paid_<source>`.
+- `campaign_id`: first-touch `utm_campaign`.
+- `audience_segment`: only from links you share. Add `?audience=recruiter` (or `utm_audience=`) to a link and every event from that visitor carries it. E.g. `https://your-site/?utm_source=linkedin&utm_campaign=job_hunt&audience=recruiter`.
+
+Properties with no value are omitted, never sent as `null` or `"unknown"`.
+
+To add an event, add a typed helper in `src/lib/analytics.ts`. Links need nothing: they're classified automatically.
+
+Privacy: session replays mask everything typed into inputs, and the `/admin` page is never initialised, tracked or recorded.
 
 ## SEO and AI discoverability
 

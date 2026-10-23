@@ -6,6 +6,7 @@ import { siteUrl } from "@/lib/site";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import MixpanelTracker from "@/components/MixpanelTracker";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -74,8 +75,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <SmoothScroll>
-          <Analytics />
-          <SpeedInsights/>
+          {/* debug off: their dev logs would flood the terminal (browserToTerminal) */}
+          <Analytics debug={false} />
+          <SpeedInsights debug={false} />
+          <MixpanelTracker />
           {children}
         </SmoothScroll>
       </body>

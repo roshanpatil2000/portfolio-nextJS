@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { track } from "@/lib/analytics";
 
 type Theme = "light" | "dark";
 
@@ -22,6 +23,7 @@ export default function ThemeToggle() {
       localStorage.setItem("theme", next);
     } catch {}
     window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
+    track("theme_changed", { theme: next });
   };
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { REPLAY_BLOCK_ATTR } from "@/lib/analytics";
 
 type Status = { kind: "idle" } | { kind: "busy" } | { kind: "ok"; text: string } | { kind: "error"; text: string };
 
@@ -41,7 +42,8 @@ export default function ResumeUploader() {
   const field = "mt-2 w-full border border-line bg-bg-raised px-3 py-2.5 text-ink outline-none transition-colors focus:border-ink";
 
   return (
-    <form onSubmit={submit} className="mt-10 flex flex-col gap-6">
+    // Blocked from Mixpanel session replays: this form holds the admin token.
+    <form onSubmit={submit} {...{ [REPLAY_BLOCK_ATTR]: "" }} className="mt-10 flex flex-col gap-6">
       <label className="block">
         <span className="hud-label text-muted">Admin token</span>
         <input

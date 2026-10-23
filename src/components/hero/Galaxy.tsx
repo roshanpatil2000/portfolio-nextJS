@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { galaxyMedia, type Media } from "@/content/home";
 import { sceneFrame } from "@/lib/generative";
 import { paintSkillTile, toHex } from "@/lib/skillTiles";
+import { track } from "@/lib/analytics";
 import { introBeats, introClock } from "@/components/intro/clock";
 import { layout, look, mobile, motion, pointer } from "./galaxyConfig";
 import { cardFragment, cardVertex } from "./shaders";
@@ -240,6 +241,8 @@ function Field({
         c.clicks.push({ u: (s.mouse.x - c.x) / w + 0.5, v: (s.mouse.y - c.y) / h + 0.5, born: s.time });
         if (c.clicks.length > 4) c.clicks.shift();
         c.boostOn = !c.boostOn;
+        const skill = (c.mat.uniforms.uMap.value as THREE.Texture).userData.skill;
+        if (skill && c.boostOn) track("skill_tile_clicked", { skill: skill.name });
       }
     };
     window.addEventListener("pointermove", move, { passive: true });

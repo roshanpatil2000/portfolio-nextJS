@@ -22,7 +22,12 @@ export default function ProjectGrid() {
 
       <div data-reveal-group className="grid gap-px border-t border-line bg-line md:grid-cols-2">
         {projects.items.map((p, i) => (
-          <article key={p.title} data-reveal className="group flex flex-col bg-bg">
+          <article
+            key={p.title}
+            data-reveal
+            data-project-id={p.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}
+            className="group flex flex-col bg-bg"
+          >
             <CellHeader left={p.label} right={pad(i + 1)} />
             <div className="relative aspect-video w-full overflow-hidden bg-bg-sunken">
               <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.03]">
