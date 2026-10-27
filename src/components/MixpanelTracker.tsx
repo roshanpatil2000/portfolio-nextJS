@@ -35,7 +35,13 @@ function destinationOf(url: URL) {
 }
 
 function labelOf(a: HTMLAnchorElement) {
-  return (a.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 80) || a.getAttribute("aria-label") || undefined;
+  // data-track-label overrides links whose text includes decoration (e.g. "04Skills").
+  return (
+    a.getAttribute("data-track-label") ||
+    (a.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 80) ||
+    a.getAttribute("aria-label") ||
+    undefined
+  );
 }
 
 // Turns a link click into the matching plan event.

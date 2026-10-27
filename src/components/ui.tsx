@@ -15,12 +15,14 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
 type ButtonProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   variant?: "solid" | "outline";
   size?: "sm" | "md";
+  /** Full width on phones, back to fit-content from `sm` up. */
+  stretch?: boolean;
   children: ReactNode;
 };
 
-export function Button({ variant = "solid", size = "md", className = "", children, ...rest }: ButtonProps) {
-  const base =
-    "group/btn relative inline-flex w-fit items-center justify-center gap-2 overflow-hidden rounded-none font-mono font-bold uppercase tracking-[0.12em] whitespace-nowrap transition-[opacity,color,border-color,background-color] duration-150";
+export function Button({ variant = "solid", size = "md", stretch = false, className = "", children, ...rest }: ButtonProps) {
+  const width = stretch ? "w-full sm:w-fit" : "w-fit";
+  const base = `group/btn relative inline-flex ${width} items-center justify-center gap-2 overflow-hidden rounded-none font-mono font-bold uppercase tracking-[0.12em] whitespace-nowrap transition-[opacity,color,border-color,background-color] duration-150`;
   const sizes = { sm: "px-5 py-2 text-[11px]", md: "px-5 py-3 text-xs" };
   const variants = {
     solid: "bg-invert-bg text-invert-fg hover:opacity-80",

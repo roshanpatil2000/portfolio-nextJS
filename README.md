@@ -99,6 +99,8 @@ Event names are snake_case. Clicks, inputs and rage clicks are autocaptured; Mix
 
 Supporting UI events: `internal_link_clicked`, `outbound_link_clicked` (`destination`: github, linkedin, …), `skill_tile_clicked`, `theme_changed`.
 
+Click events carry a `location`: the section the click came from (`hero`, `projects`, `contact`, …), or `nav`, `footer`, `rail` (desktop ruler labels) or `mobile_menu` (the phone menu).
+
 **Attribution (on every event as super properties):**
 
 - `landing_source`: first-touch channel: `utm_source`, or from the referrer (`organic_search`, `linkedin`, `github`, `twitter`, `ai_assistant`, `referral`, `direct`). Paid UTMs (`utm_medium=cpc`) become `paid_search` / `paid_<source>`.

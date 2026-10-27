@@ -27,27 +27,31 @@ export default function Hero() {
             <p data-reveal className="relative mt-4 max-w-md text-lg leading-relaxed text-muted">
               {hero.sub}
             </p>
-            <div data-reveal className="pointer-events-auto relative mt-7 flex flex-wrap items-center justify-center gap-3">
-              <Button href={hero.primary.href}>
+            <div
+              data-reveal
+              className="pointer-events-auto relative mt-7 flex w-full max-w-xs flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:flex-wrap"
+            >
+              <Button href={hero.primary.href} stretch>
                 {hero.primary.label}
                 <ArrowIcon className="h-4 w-4 rotate-90 transition-transform duration-200 group-hover/btn:translate-y-0.5" />
               </Button>
-              <Button href={hero.secondary.href} variant="outline" className="bg-bg/60 backdrop-blur-sm">
+              <Button href={hero.secondary.href} variant="outline" stretch className="bg-bg/60 backdrop-blur-sm">
                 {hero.secondary.label}
               </Button>
             </div>
-            <div data-reveal className="pointer-events-auto relative mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            {/* Items carry py-1.5 tap padding; the margins absorb it so spacing matches the unpadded row. */}
+            <div data-reveal className="pointer-events-auto relative mt-5.5 -mb-1.5 flex flex-wrap items-center justify-center gap-x-6">
               <a
                 href={brand.links.github}
                 target="_blank"
                 rel="noreferrer"
-                className="hud-label flex items-center gap-1.5 text-faint transition-colors hover:text-ink"
+                className="hud-label flex items-center gap-1.5 py-1.5 text-faint transition-colors hover:text-ink"
               >
                 <GithubIcon className="h-3 w-3" />
                 {hero.meta[0]}
               </a>
               {hero.meta.slice(1).map((m) => (
-                <p key={m} className="hud-label text-faint">
+                <p key={m} className="hud-label py-1.5 text-faint">
                   {m}
                 </p>
               ))}

@@ -95,9 +95,11 @@ export default function Choreography() {
         }
 
         // Delay each child by its horizontal position so a row sweeps left to right.
+        // Clamped so cards scrolled off to the right of a swipe row don't lag behind.
         const box = group.getBoundingClientRect();
         items.forEach((el) => {
-          const delay = box.width > 0 ? ((el.getBoundingClientRect().left - box.left) / box.width) * 0.18 : 0;
+          const x = box.width > 0 ? (el.getBoundingClientRect().left - box.left) / box.width : 0;
+          const delay = Math.min(x * 0.18, 0.18);
           ScrollTrigger.create({
             trigger: el,
             start: "top 88%",

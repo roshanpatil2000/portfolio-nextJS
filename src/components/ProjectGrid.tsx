@@ -1,9 +1,11 @@
 import { projects } from "@/content/home";
 import Section, { CellHeader } from "@/components/Section";
 import MediaView from "@/components/MediaView";
+import ProjectSwipeCounter from "@/components/ProjectSwipeCounter";
 import { AccentHeading, ArrowIcon } from "@/components/ui";
 
 const pad = (n: number) => String(n).padStart(2, "0");
+const card = "w-[85%] shrink-0 snap-start md:w-auto";
 
 export default function ProjectGrid() {
   return (
@@ -20,13 +22,18 @@ export default function ProjectGrid() {
         </p>
       </div>
 
-      <div data-reveal-group className="grid gap-px border-t border-line bg-line md:grid-cols-2">
+      {/* Below md the cards become a swipe row, each 85% wide so the next one peeks in. */}
+      <div
+        id="projects-row"
+        data-reveal-group
+        className="flex snap-x snap-mandatory gap-px overflow-x-auto border-t border-line bg-line [scrollbar-width:none] md:grid md:snap-none md:grid-cols-2 md:overflow-visible [&::-webkit-scrollbar]:hidden"
+      >
         {projects.items.map((p, i) => (
           <article
             key={p.title}
             data-reveal
             data-project-id={p.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}
-            className="group flex flex-col bg-bg"
+            className={`group flex flex-col bg-bg ${card}`}
           >
             <CellHeader left={p.label} right={pad(i + 1)} />
             <div className="relative aspect-video w-full overflow-hidden bg-bg-sunken">
@@ -48,7 +55,7 @@ export default function ProjectGrid() {
           </article>
         ))}
 
-        <a href={projects.more.href} target="_blank" rel="noreferrer" data-reveal className="group flex flex-col bg-bg">
+        <a href={projects.more.href} target="_blank" rel="noreferrer" data-reveal className={`group flex flex-col bg-bg ${card}`}>
           <CellHeader left={projects.more.label} right={pad(projects.items.length + 1)} />
           <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-4 overflow-hidden bg-bg-sunken">
             <span className="flex h-14 w-14 items-center justify-center border border-line-strong text-ink transition-colors duration-200 group-hover:border-ink group-hover:bg-invert-bg group-hover:text-invert-fg">
@@ -64,6 +71,7 @@ export default function ProjectGrid() {
           </div>
         </a>
       </div>
+      <ProjectSwipeCounter targetId="projects-row" count={projects.items.length + 1} />
     </Section>
   );
 }
