@@ -64,6 +64,7 @@ export const nav = {
   ],
   secondary: [
     { label: "GitHub", href: brand.links.github },
+    { label: "LinkedIn", href: brand.links.linkedin },
     { label: "Resume", href: brand.resume, download: brand.resumeFileName },
   ],
   cta: { label: "Hire me", href: `mailto:${brand.email}` },

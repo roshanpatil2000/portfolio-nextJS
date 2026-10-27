@@ -94,7 +94,7 @@ Event names are snake_case. Clicks, inputs and rage clicks are autocaptured; Mix
 | `page_view` | `page_location` | Every page load |
 | `contact_intent_submitted` | `intent_type` (`hiring_inquiry`), `landing_page`, `cta_location` | An email link is clicked ("Email me", "Hire me", the address) |
 | `resume_download` | `file_name`, `download_location` (`nav`, `contact`), `page_location` | Any Resume button is clicked |
-| `content_engaged` | `content_type`, `content_id`, `engagement_action` | A section is 35% on screen (`portfolio_section` / `viewed`), a project card is 60% on screen (`project` / `viewed`), the page is half scrolled (`portfolio` / `scrolled_50`). Each fires once per visit |
+| `content_engaged` | `content_type`, `content_id`, `engagement_action` | A section holds the middle of the screen for 2 s (`portfolio_section` / `viewed`), a project card is 60% on screen for 1.5 s (`project` / `viewed`), the page is half scrolled (`portfolio` / `scrolled_50`). Each fires once per visit; scrolling or jumping past content doesn't count |
 | `session_returned` | `return_window_days`, `return_landing_page`, `engaged_feature_on_return` | A visitor returns 1+ days after their last visit; sent as that visit ends. "Engaged" means they contacted you or downloaded the resume |
 
 Supporting UI events: `internal_link_clicked`, `outbound_link_clicked` (`destination`: github, linkedin, …), `skill_tile_clicked`, `theme_changed`.
@@ -110,6 +110,8 @@ Properties with no value are omitted, never sent as `null` or `"unknown"`.
 To add an event, add a typed helper in `src/lib/analytics.ts`. Links need nothing: they're classified automatically.
 
 Privacy: session replays mask everything typed into inputs, and the `/admin` page is never initialised, tracked or recorded.
+
+Data quality: headless and automated browsers (Vercel's deploy checks, crawlers, Lighthouse) aren't tracked, and clicks on the resume and email links aren't reported as dead clicks, since downloading a file or opening mail never changes the page. View timing lives in `SECTION_VIEW` / `PROJECT_VIEW` in `src/components/MixpanelTracker.tsx`.
 
 ## SEO and AI discoverability
 

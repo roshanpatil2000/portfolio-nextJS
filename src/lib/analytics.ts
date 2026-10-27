@@ -21,8 +21,18 @@ let ready = false;
 // Anything marked with this attribute is blocked from session replays.
 export const REPLAY_BLOCK_ATTR = "data-mp-block";
 
+// Headless/automated browsers (Vercel's deploy checks, crawlers, test runners)
+// would otherwise show up as visitors.
+function isAutomated() {
+  return navigator.webdriver || /HeadlessChrome|Lighthouse|bot|crawler|spider/i.test(navigator.userAgent);
+}
+
+// Links that download a file or open the mail app don't change the page, so
+// Mixpanel would report every click on them as a "dead click".
+const NO_PAGE_CHANGE_LINKS = 'a[href="/resume"], a[href^="mailto:"]';
+
 export function initAnalytics() {
-  if (ready || !token || typeof window === "undefined") return;
+  if (ready || !token || typeof window === "undefined" || isAutomated()) return;
   mixpanel.init(token, {
     api_host: apiHost,
     // The SDK's own debug output is verbose; send() logs one line per event instead.
@@ -30,7 +40,14 @@ export function initAnalytics() {
     persistence: "localStorage",
     // Clicks, inputs and rage clicks are autocaptured; page views are not,
     // because page_view below carries the attribution properties instead.
-    autocapture: { pageview: false },
+    autocapture: {
+      pageview: false,
+      // Dead clicks are reported with the original click event ~500ms after
+      // it happened; normal clicks are captured immediately. Dropping the late
+      // reports on download/mail links keeps their real clicks and heatmaps.
+      block_element_callback: (el, ev) =>
+        !!el.closest?.(NO_PAGE_CHANGE_LINKS) && performance.now() - ev.timeStamp > 300,
+    },
     track_pageview: false,
     record_sessions_percent: 100, // record every session
     record_heatmap_data: true,

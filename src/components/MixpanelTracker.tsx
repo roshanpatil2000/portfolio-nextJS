@@ -63,21 +63,51 @@ function trackLink(a: HTMLAnchorElement) {
   } catch {}
 }
 
-// Fires `onSeen` once per element, the first time it's at least `threshold` visible.
-function observeOnce(els: Element[], threshold: number, onSeen: (el: Element) => void) {
+// Fires `onSeen` once per element, but only after it has stayed in view for
+// `dwellMs` without interruption. Scrolling or jumping past content (e.g. a
+// nav link to #contact) restarts the clock, so fly-bys don't count as views.
+function observeDwell(
+  els: Element[],
+  options: { dwellMs: number; threshold?: number; rootMargin?: string },
+  onSeen: (el: Element) => void,
+) {
+  const timers = new Map<Element, number>();
   const io = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        io.unobserve(entry.target);
-        onSeen(entry.target);
+        const el = entry.target;
+        if (entry.isIntersecting) {
+          if (timers.has(el)) continue;
+          timers.set(
+            el,
+            window.setTimeout(() => {
+              timers.delete(el);
+              // A background tab isn't being read.
+              if (document.visibilityState !== "visible") return;
+              io.unobserve(el);
+              onSeen(el);
+            }, options.dwellMs),
+          );
+        } else {
+          window.clearTimeout(timers.get(el));
+          timers.delete(el);
+        }
       }
     },
-    { threshold },
+    { threshold: options.threshold ?? 0, rootMargin: options.rootMargin },
   );
   els.forEach((el) => io.observe(el));
-  return () => io.disconnect();
+  return () => {
+    io.disconnect();
+    timers.forEach((t) => window.clearTimeout(t));
+  };
 }
+
+// A section is "in view" while it covers the middle of the screen, which works
+// for sections of any height (a % threshold never fires on tall ones).
+const SECTION_VIEW = { rootMargin: "-45% 0px -45% 0px", dwellMs: 2000 };
+// A project card is "in view" when most of it is on screen.
+const PROJECT_VIEW = { threshold: 0.6, dwellMs: 1500 };
 
 export default function MixpanelTracker() {
   const pathname = usePathname();
@@ -119,11 +149,11 @@ export default function MixpanelTracker() {
   useEffect(() => {
     if (pathname !== "/") return;
     const sections = sectionIndex.map((s) => document.getElementById(s.id)).filter((el): el is HTMLElement => !!el);
-    const stopSections = observeOnce(sections, 0.35, (el) =>
+    const stopSections = observeDwell(sections, SECTION_VIEW, (el) =>
       trackContentEngaged({ content_type: "portfolio_section", content_id: el.id, engagement_action: "viewed" }),
     );
     const projects = Array.from(document.querySelectorAll("[data-project-id]"));
-    const stopProjects = observeOnce(projects, 0.6, (el) =>
+    const stopProjects = observeDwell(projects, PROJECT_VIEW, (el) =>
       trackContentEngaged({
         content_type: "project",
         content_id: el.getAttribute("data-project-id") ?? "",
